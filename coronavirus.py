@@ -28,6 +28,8 @@ TABLE_COLUMNS = {
     "TotalTests": "Tests",
     "Tests/1Mpop": "TPM",
     "Continent": "Continent",
+    "Population": "Pop",
+    "#": "#",
 }
 
 
@@ -95,6 +97,9 @@ class HTMLTableParser:
                     ({unknown_cols}). Please raise an issue on github."
             )
 
+        # remove the column "#"
+        df.drop(columns=["#"], inplace=True)
+
         # convert a few columns to 'int'
         for col in [
             "Cases",
@@ -105,6 +110,7 @@ class HTMLTableParser:
             "Active",
             "Critical",
             "Tests",
+            "Pop",
         ]:
             df[col] = df[col].replace("", 0)
             df[col] = df[col].replace("N/A", 0)
@@ -189,7 +195,12 @@ def main():
     # perform sorting if needed
     if args.sort_col != "None":
         if args.sort_col in table.columns:
-            table = table.sort_values(args.sort_col, ascending=args.asc)
+            table.sort_values(
+                args.sort_col,
+                ascending=args.asc,
+                inplace=True,
+                ignore_index=True,
+            )
         else:
             print(
                 f"ERROR: provided column name '{args.sort_col}' is invalid. "
